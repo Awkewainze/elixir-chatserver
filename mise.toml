@@ -1,0 +1,43 @@
+[settings]
+minimum_release_age = "30d" # Nothing newer than 30 days to help avoid supply chain attack
+paranoid = true
+
+[tools]
+erlang = "28"
+elixir = "1.19"
+"aqua:protocolbuffers/protobuf/protoc" = "latest"
+
+[tasks.install]
+sources = ["mix.exs"]
+run = "mix deps.get"
+
+[tasks.generate_proto]
+depends = ["install"]
+sources = ["proto/**/*.proto"]
+run = "protoc --elixir_out=lib/proto_out --proto_path=proto proto/*.proto"
+
+[tasks.format]
+run = "mix format"
+
+[tasks.check_format]
+run = "mix format --check-formatted"
+
+[tasks.compile]
+depends = ["install", "generate_proto"]
+sources = ["lib/**/*"]
+run = "mix compile"
+
+[tasks.test]
+depends = "compile"
+run = "mix test"
+
+[tasks.iex]
+depends = "compile"
+run = "iex -S mix"
+
+[tasks.ci]
+depends = ["compile", "check_format", "test"]
+
+[tasks.build]
+depends = "ci"
+run = "mix hex.build"
