@@ -1,6 +1,5 @@
 [settings]
 minimum_release_age = "30d" # Nothing newer than 30 days to help avoid supply chain attack
-paranoid = true
 
 [tools]
 erlang = "28"
@@ -12,12 +11,12 @@ sources = ["mix.exs"]
 run = "mix deps.get"
 
 [tasks.install_protoc-gen-elixir]
-depends = "install"
+depends = ["install"]
 run = "command -v protoc-gen-elixir >/dev/null 2>&1 || mix escript.install hex protobuf 0.16.0"
 description = "Install protoc-gen-elixir if not installed"
 
 [tasks.generate_proto]
-depends = ["install", "install_protoc-gen-elixir"]
+depends = ["install_protoc-gen-elixir"]
 sources = ["proto/**/*.proto"]
 run = "protoc --elixir_out=lib/proto_out --proto_path=proto proto/*.proto"
 
@@ -33,16 +32,16 @@ sources = ["lib/**/*"]
 run = "mix compile"
 
 [tasks.test]
-depends = "compile"
+depends = ["compile"]
 run = "mix test"
 
 [tasks.iex]
-depends = "compile"
+depends = ["compile"]
 run = "iex -S mix"
 
 [tasks.ci]
 depends = ["compile", "check_format", "test"]
 
 [tasks.build]
-depends = "ci"
+depends = ["compile", "check_format"]
 run = "mix hex.build"
