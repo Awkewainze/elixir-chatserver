@@ -11,8 +11,13 @@ elixir = "1.19"
 sources = ["mix.exs"]
 run = "mix deps.get"
 
+[tasks.install_protoc-gen-elixir]
+depends = "install"
+run = "command -v protoc-gen-elixir >/dev/null 2>&1 || mix escript.install hex protobuf 0.16.0"
+description = "Install protoc-gen-elixir if not installed"
+
 [tasks.generate_proto]
-depends = ["install"]
+depends = ["install", "install_protoc-gen-elixir"]
 sources = ["proto/**/*.proto"]
 run = "protoc --elixir_out=lib/proto_out --proto_path=proto proto/*.proto"
 
